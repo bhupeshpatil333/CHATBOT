@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+html, body { 
+  height: 100%; 
+  margin: 0; 
+  background-color: #05111d; /* Force dark background globally */
+  color: white;
+}
+
+* {
+  box-sizing: border-box;
+}

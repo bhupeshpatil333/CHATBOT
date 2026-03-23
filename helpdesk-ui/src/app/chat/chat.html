@@ -1,0 +1,97 @@
+<div class="main-shell">
+  <div class="app-header">TICKET MANAGEMENT</div>
+
+  <div class="nav-container">
+    <button class="nav-item" [class.active]="activeTab === 'chat'" (click)="switchTab('chat')" matTooltip="Open Chat Assistant">
+      <mat-icon>chat_bubble_outline</mat-icon> Chat
+    </button>
+    <button class="nav-item" [class.active]="activeTab === 'tickets'" (click)="switchTab('tickets')" matTooltip="View My Support Tickets">
+      <mat-icon>assignment_ind</mat-icon> Tickets
+    </button>
+    <button class="nav-item" [class.active]="activeTab === 'kb'" (click)="switchTab('kb')" matTooltip="Browse Solutions & FAQs">
+      <mat-icon>library_books</mat-icon> Knowledge Base
+    </button>
+  </div>
+
+  <!-- CHAT VIEW -->
+  <div class="chat-viewport" *ngIf="activeTab === 'chat'">
+    <div class="quick-actions">
+      <button *ngFor="let action of quickActions" class="chip" (click)="onQuickAction(action)">
+        {{action}}
+      </button>
+    </div>
+
+    <div class="chat-history">
+      <div *ngFor="let msg of messages" class="msg-row" [ngClass]="msg.sender">
+        <div class="avatar" *ngIf="msg.sender === 'bot'">🤖</div>
+        <div class="bubble">
+          <p style="white-space: pre-line;">{{ msg.text }}</p>
+          <button *ngIf="msg.showTicketOption" class="action-btn" (click)="openTicketForm()">
+            Create Ticket
+          </button>
+        </div>
+      </div>
+      <div *ngIf="isTyping" class="msg-row bot typing">
+          <div class="avatar">🤖</div>
+          <div class="bubble">Thinking...</div>
+      </div>
+    </div>
+
+    <div class="input-area" *ngIf="!showTicketForm" style="display: flex; gap: 8px;">
+        <div class="input-wrapper" style="flex: 1;">
+            <input type="text" placeholder="Describe your IT issue..." [(ngModel)]="userInput" (keyup.enter)="sendMessage()">
+        </div>
+        <button class="send-btn" (click)="sendMessage()" matTooltip="Send Message">
+            Send <mat-icon>send</mat-icon>
+        </button>
+        <button class="ticket-btn" (click)="openTicketForm()" matTooltip="Create a New Support Ticket">
+            <mat-icon>assignment</mat-icon>
+        </button>
+    </div>
+
+    <div class="ticket-modal" *ngIf="showTicketForm">
+        <h3>Create Support Ticket</h3>
+        <input type="text" placeholder="Issue Summary" [(ngModel)]="ticketIssue">
+        <textarea rows="3" placeholder="Description" [(ngModel)]="ticketDesc"></textarea>
+        <div class="form-footer">
+            <button class="submit-btn" (click)="submitTicket()">Submit Ticket</button>
+            <button class="cancel-btn" (click)="showTicketForm = false">Cancel</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- TICKETS VIEW -->
+  <div class="ticket-list" *ngIf="activeTab === 'tickets'">
+    <h3 class="view-title">My Recent Tickets</h3>
+    <div class="ticket-card" *ngFor="let t of tickets">
+        <div class="ticket-header">
+            <span class="ticket-id">#{{t.id}}</span>
+            <span class="ticket-status">{{t.status}}</span>
+        </div>
+        <div class="ticket-issue">{{t.issue}}</div>
+        <div class="ticket-desc">{{t.description}}</div>
+        <div class="ticket-date">{{t.created_date | date:'medium'}}</div>
+    </div>
+    <div *ngIf="tickets.length === 0" class="placeholder-view">
+        <p>No tickets found. Create one if you have an issue!</p>
+    </div>
+  </div>
+
+  <!-- KB VIEW -->
+  <div class="kb-container" *ngIf="activeTab === 'kb'">
+    <div class="kb-search">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search Knowledge Base..." [(ngModel)]="kbSearchQuery" (ngModelChange)="filterKB()">
+    </div>
+    
+    <div class="kb-list">
+        <div class="kb-item" *ngFor="let item of filteredKB">
+            <div class="kb-question">{{item.question}}</div>
+            <div class="kb-answer">{{item.answer}}</div>
+        </div>
+    </div>
+    <div *ngIf="filteredKB.length === 0" class="placeholder-view">
+        <p>No matching solutions found in the Knowledge Base.</p>
+    </div>
+  </div>
+</div>
