@@ -6,6 +6,7 @@ import datetime
 from pydantic import BaseModel
 import uuid
 import os
+from difflib import SequenceMatcher
 
 # --- DATABASE SETUP (SQLite) ---
 SQLALCHEMY_DATABASE_URL = "sqlite:///./helpdesk.db"
@@ -129,9 +130,6 @@ def chat(request: ChatRequest, db: Session = Depends(get_db)):
     is_resolved = True
     user_msg = request.message.lower().strip()
 
-from difflib import SequenceMatcher
-
-# ... (inside chat function)
     # 1. Local FAQ Machine - Smart Fuzzy Score Match
     faqs = db.query(FAQ).all()
     best_match = None
