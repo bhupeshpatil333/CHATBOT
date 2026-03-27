@@ -160,6 +160,12 @@ def chat(request: ChatRequest, db: Session = Depends(get_db)):
         if not bot_response:
              bot_response = "I'm having trouble connecting to my AI brain. Would you like to create a ticket?"
              is_resolved = False
+        else:
+             # Autonomous Learning Engine: Save AI responses to local DB
+             # Extracts unique words as keywords to answer similar queries in the future locally
+             keywords = ",".join(set(user_msg.replace("?", "").split()))
+             new_faq = FAQ(question=user_msg, answer=bot_response, keywords=keywords)
+             db.add(new_faq)
 
     # 3. Learning System Log
     log = ChatLog(user_query=request.message, bot_response=bot_response, is_resolved=is_resolved)
